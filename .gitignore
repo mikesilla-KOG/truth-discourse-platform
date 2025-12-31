@@ -1,0 +1,30 @@
+# Node
+node_modules/
+.pnpm-store/
+.pnp.cjs
+.pnp.loader.mjs
+*.log
+
+# Next
+.next/
+out/
+
+# Build
+dist/
+coverage/
+
+# Env
+.env
+.env.local
+.env.*.local
+
+# Misc
+.DS_Store
+.vscode/
+.idea/
+
+# Docker
+docker-compose.override.yml
+
+# Prisma
+apps/api/prisma/dev.db

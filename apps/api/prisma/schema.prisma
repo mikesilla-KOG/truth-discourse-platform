@@ -1,0 +1,127 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum GroupVisibility {
+  PUBLIC
+  PRIVATE
+  SECRET
+}
+
+enum MembershipRole {
+  MEMBER
+  MODERATOR
+  ADMIN
+}
+
+enum ReactionType {
+  AGREE
+  DISAGREE
+  INSIGHTFUL
+  QUESTION
+  SOURCE_NEEDED
+}
+
+enum ReportStatus {
+  OPEN
+  RESOLVED
+  DISMISSED
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  username  String   @unique
+  password  String
+  bio       String?
+  avatar    String?
+  posts     Post[]
+  comments  Comment[]
+  memberships Membership[]
+  reactions Reaction[]
+  reports   Report[] @relation("reportsBy")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Group {
+  id         Int              @id @default(autoincrement())
+  name       String
+  slug       String           @unique
+  visibility GroupVisibility  @default(PUBLIC)
+  rules      String?
+  ownerId    Int
+  owner      User             @relation(fields: [ownerId], references: [id])
+  memberships Membership[]
+  posts      Post[]
+  createdAt  DateTime         @default(now())
+}
+
+model Membership {
+  id      Int           @id @default(autoincrement())
+  userId  Int
+  groupId Int
+  role    MembershipRole @default(MEMBER)
+  user    User          @relation(fields: [userId], references: [id])
+  group   Group         @relation(fields: [groupId], references: [id])
+  createdAt DateTime    @default(now())
+
+  @@unique([userId, groupId])
+}
+
+model Post {
+  id        Int      @id @default(autoincrement())
+  authorId  Int
+  groupId   Int?
+  content   String   @db.Text
+  source    String?
+  images    String[] @default([])
+  comments  Comment[]
+  reactions Reaction[]
+  author    User     @relation(fields: [authorId], references: [id])
+  group     Group?   @relation(fields: [groupId], references: [id])
+  createdAt DateTime @default(now())
+}
+
+model Comment {
+  id        Int      @id @default(autoincrement())
+  postId    Int
+  authorId  Int
+  parentId  Int?     
+  depth     Int      @default(0)
+  content   String   @db.Text
+  replies   Comment[] @relation("CommentReplies")
+  author    User     @relation(fields: [authorId], references: [id])
+  post      Post     @relation(fields: [postId], references: [id])
+  parent    Comment? @relation("CommentReplies", fields: [parentId], references: [id])
+  reactions Reaction[]
+  createdAt DateTime @default(now())
+}
+
+model Reaction {
+  id        Int          @id @default(autoincrement())
+  userId    Int
+  type      ReactionType
+  postId    Int?
+  commentId Int?
+  user      User         @relation(fields: [userId], references: [id])
+  post      Post?        @relation(fields: [postId], references: [id])
+  comment   Comment?     @relation(fields: [commentId], references: [id])
+  createdAt DateTime     @default(now())
+}
+
+model Report {
+  id         Int        @id @default(autoincrement())
+  reporterId Int
+  targetType String
+  targetId   Int
+  reason     String
+  status     ReportStatus @default(OPEN)
+  reporter   User       @relation("reportsBy", fields: [reporterId], references: [id])
+  createdAt  DateTime   @default(now())
+}

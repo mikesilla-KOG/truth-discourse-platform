@@ -1,0 +1,13 @@
+{
+  "name": "truth-discourse-platform",
+  "private": true,
+  "version": "0.1.0",
+  "description": "DiscourseTruth — truth-seeking social network",
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "turbo run dev",
+    "install:all": "pnpm -w install"
+  }
+}

@@ -13,6 +13,23 @@ export class GroupsController {
     return this.groups.createGroup({ ...body, ownerId });
   }
 
+  @Get()
+  async list() {
+    return this.groups.list();
+  }
+
+  @Post(':slug/join')
+  @UseGuards(JwtAuthGuard)
+  async join(@Param('slug') slug: string, @Req() req: any) {
+    return this.groups.joinGroup(slug, req.user.id);
+  }
+
+  @Post(':slug/leave')
+  @UseGuards(JwtAuthGuard)
+  async leave(@Param('slug') slug: string, @Req() req: any) {
+    return this.groups.leaveGroup(slug, req.user.id);
+  }
+
   @Get(':slug')
   async get(@Param('slug') slug: string) {
     return this.groups.findBySlug(slug);

@@ -1,10 +1,10 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Pool } from 'pg';
 
 @Injectable()
 export class DbService {
   private pool: Pool;
-  private logger = new Logger(DbService.name);
+  private logger = console;
 
   constructor() {
     const url = process.env.DATABASE_URL;
@@ -205,6 +205,15 @@ export class DbService {
     const row = r.rows[0];
     const authorRes = await this.pool.query('SELECT id, username, avatar FROM users WHERE id = $1', [authorId]);
     return { ...row, author: authorRes.rows[0] };
+  }
+
+  async close() {
+    try {
+      await this.pool.end();
+      this.logger.log('DB pool closed');
+    } catch (e) {
+      this.logger.error('DB close failed', e);
+    }
   }
 
   async reactPost(postId: number, type: string, userId?: number) {

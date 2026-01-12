@@ -1,19 +1,15 @@
-import { Injectable, OnModuleInit, OnModuleDestroy, Logger } from '@nestjs/common';
+import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 
 @Injectable()
 export class PrismaService implements OnModuleInit, OnModuleDestroy {
   private client: PrismaClient | null = null;
-  private logger = new Logger(PrismaService.name);
+  private logger = console;
 
-  constructor() {
-    // don't construct PrismaClient eagerly — construct lazily in getClient()
-  }
-
-  getClient(): PrismaClient | null {
+  private getClient(): PrismaClient | null {
     if (this.client) return this.client;
     try {
-      // Try constructing client — this may fail depending on runtime config
+      // Construct a PrismaClient lazily so test environments that mock this service continue to work
       this.client = new PrismaClient();
       return this.client;
     } catch (err) {
@@ -23,10 +19,36 @@ export class PrismaService implements OnModuleInit, OnModuleDestroy {
     }
   }
 
+  // Expose commonly used model properties so consuming code can call `this.prisma.comment` etc.
+  get user(): any {
+    return this.getClient().user;
+  }
+  get post(): any {
+    return this.getClient().post;
+  }
+  get comment(): any {
+    return this.getClient().comment;
+  }
+  get group(): any {
+    return this.getClient().group;
+  }
+  get membership(): any {
+    return this.getClient().membership;
+  }
+  get reaction(): any {
+    return this.getClient().reaction;
+  }
+  get report(): any {
+    return this.getClient().report;
+  }
+
   async onModuleInit() {
-    const c = this.getClient();
-    if (!c) return;
     try {
+      const c = this.getClient();
+      if (!c) {
+        this.logger.log('Prisma client unavailable at startup; continuing without it');
+        return;
+      }
       await c.$connect();
       this.logger.log('Prisma connected');
     } catch (err) {

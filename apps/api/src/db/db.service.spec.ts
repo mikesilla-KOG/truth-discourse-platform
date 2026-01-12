@@ -10,6 +10,12 @@ describe('DbService smoke tests', () => {
     db = new DbService();
   });
 
+  afterAll(async () => {
+    if (db && typeof (db as any).close === 'function') {
+      await (db as any).close();
+    }
+  });
+
   it('seeds demo data and returns groups', async () => {
     await db.seed();
     const groups = await db.getGroups();

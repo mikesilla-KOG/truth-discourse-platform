@@ -27,9 +27,14 @@ export default function Profile() {
       <h1 className="text-2xl font-bold">Profile</h1>
       {msg && <p className="mt-4">{msg}</p>}
       {user && (
-        <div className="mt-4">
-          <p><strong>ID:</strong> {user.id}</p>
-          <p><strong>Email:</strong> {user.email}</p>
+        <div className="mt-4 flex items-center gap-4">
+          <img src={user.avatar} className="w-16 h-16 rounded-full" />
+          <div>
+            <p><strong>ID:</strong> {user.id}</p>
+            <p><strong>Username:</strong> {user.username}</p>
+            <p><strong>Email:</strong> {user.email}</p>
+            {user.bio && <p className="mt-2 text-sm text-gray-600">{user.bio}</p>}
+          </div>
         </div>
       )}
     </main>

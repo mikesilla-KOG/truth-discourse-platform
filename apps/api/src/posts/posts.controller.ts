@@ -17,6 +17,12 @@ export class PostsController {
     return this.posts.getPost(Number(id));
   }
 
+  @Post(':id/react')
+  async react(@Param('id') id: string, @Body() body: any, @Req() req: any) {
+    const user = req.user;
+    return this.posts.reactPost(Number(id), body.type || 'agree', user?.id);
+  }
+
   @Get('/')
   async feed() {
     return this.posts.feedForUser(0);

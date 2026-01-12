@@ -4,8 +4,8 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
+
 
 enum GroupVisibility {
   PUBLIC
@@ -45,6 +45,7 @@ model User {
   memberships Membership[]
   reactions Reaction[]
   reports   Report[] @relation("reportsBy")
+  ownedGroups Group[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

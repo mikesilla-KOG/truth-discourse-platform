@@ -47,6 +47,14 @@ async function main() {
     },
   });
 
+  // extra sample groups for demo
+  const g2 = await prisma.group.create({ data: { name: 'Evidence & Science', slug: 'evidence-science', visibility: 'PUBLIC', rules: 'Share sources and facts', ownerId: bob.id } });
+  await prisma.membership.create({ data: { userId: bob.id, groupId: g2.id, role: 'ADMIN' } });
+  await prisma.post.create({ data: { authorId: bob.id, groupId: g2.id, content: 'Post about recent studies and evidence.', images: [] } });
+
+  const g3 = await prisma.group.create({ data: { name: 'Open Discussion', slug: 'open-discussion', visibility: 'PUBLIC', rules: 'Be respectful', ownerId: alice.id } });
+  await prisma.membership.create({ data: { userId: alice.id, groupId: g3.id, role: 'ADMIN' } });
+
   await prisma.comment.create({
     data: {
       postId: p.id,
